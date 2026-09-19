@@ -6,25 +6,26 @@ import { Countdown } from "@/components/Countdown";
 import { LotPhotos } from "@/components/LotPhotos";
 import { CalloutStrip, Reveal, RevealHeadline } from "@/components/Motion";
 import { SpotList } from "@/components/SpotList";
-import { BIDDING_ENDS_AT, CAMPAIGN, SPOTS } from "@/data/spots";
+import { BIDDING_ENDS_AT, CAMPAIGN, SPOTS, deadlineLabel } from "@/data/spots";
 import { getLiveData } from "@/lib/board";
 
 // Bids change often; re-check at most every 30s (a placed bid revalidates immediately).
 export const revalidate = 30;
 
-// TODO: confirm deliverables with Jigyasa
 const PERKS = [
   "Your brand printed on the blazer or the bag, and on me for the whole day",
-  "A short video and a recap video from the event, plus a tweet with photos",
-  "A shoutout and a tag in my thank-you post",
-  "People will ask me about your brand. I'll tell them about you",
-  "The posts stay up after the event, so people keep seeing them",
+  "1 announcement video",
+  "1 founder interview",
+  "2 short videos",
+  "An Instagram travel vlog",
+  "An event recap",
+  "A sponsor thank-you post",
 ];
 
 const FAQ = [
   {
     q: "How does bidding work?",
-    a: "Each spot has a starting price. To bid, you have to go at least $50 over the current top bid. Bidding ends Sep 30 at 11:59 PM Singapore time, and whoever's on top then wins.",
+    a: `Each spot has a starting price. To bid, you have to go at least $50 over the current top bid. Bidding ends ${deadlineLabel()} at 11:59 PM Singapore time, and whoever's on top then wins.`,
   },
   {
     q: "Someone bid on both spots. What happens to my blazer bid?",
@@ -32,7 +33,7 @@ const FAQ = [
   },
   {
     q: "Do I pay when I bid?",
-    a: "Nope, there's no payment on the site. If you win, I'll DM you after Sep 30 and we'll sort it out. Bank transfer or USDC, whichever's easier for you.",
+    a: `Nope, there's no payment on the site. If you win, I'll DM you after ${deadlineLabel()} and we'll sort it out. Bank transfer or USDC, whichever's easier for you.`,
   },
   {
     q: "What kind of logo file do you need?",
@@ -100,8 +101,8 @@ export default async function Home() {
             </span>
           </p>
           <RevealHeadline
-            text="Put your brand on my blazer, my bag, or both."
-            accent={["both."]}
+            text={CAMPAIGN.headline}
+            accent={CAMPAIGN.headlineAccent.split(" ")}
             className="mx-auto mt-4 max-w-3xl text-balance font-display text-5xl leading-[1.02] tracking-[-0.01em] sm:text-7xl"
           />
           <p className="mx-auto mt-5 max-w-xl text-lg leading-8 text-muted sm:text-xl">
@@ -114,7 +115,7 @@ export default async function Home() {
         </section>
 
         {/* Callout strip */}
-        <CalloutStrip title="Just two spots." sub="no wall of logos, just yours" />
+        <CalloutStrip title={CAMPAIGN.tagline[0].toUpperCase()} sub={CAMPAIGN.tagline[1].toUpperCase()} />
 
         {/* Spots / bidding */}
         <section id="spots" className="mx-auto w-full max-w-5xl scroll-mt-20 px-4 py-16 sm:px-6 sm:py-20">
@@ -167,7 +168,7 @@ export default async function Home() {
               Pretty simple, <em>really</em>
             </h2>
             <p className="mt-4 max-w-2xl text-lg leading-8 text-muted">
-              Pick the blazer, the bag, or both, and put in a bid. Anyone can outbid you until Sep 30, so keep an eye on the board.
+              Pick the blazer, the bag, or both, and put in a bid. Anyone can outbid you until {deadlineLabel()}, so keep an eye on the board.
               Whoever&apos;s on top at the end wins. I&apos;ll get in touch, you send me your brand files, I get them printed, and then I wear
               your brand around TOKEN2049 all day.
             </p>

@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { placeBid, type BidState } from "@/app/actions";
-import { CAMPAIGN, SPOTS, formatUsd, minNextBid, spotById, type Board, type Spot } from "@/data/spots";
+import { CAMPAIGN, SPOTS, deadlineLabel, formatUsd, minNextBid, spotById, type Board, type Spot } from "@/data/spots";
 
 type Props = {
   spot: Spot | null;
@@ -129,7 +129,7 @@ export function BidDialog({ spot, board, open, onClose, onPlaced }: Props) {
                 </div>
               </div>
               <p className="mt-4 text-sm text-muted">
-                No payment on the site. Drop me a DM so I know it&apos;s you, and I&apos;ll sort the rest out with the winner after Sep 30.
+                No payment on the site. Drop me a DM so I know it&apos;s you, and I&apos;ll sort the rest out with the winner after {deadlineLabel()}.
               </p>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <a

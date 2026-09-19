@@ -47,17 +47,22 @@ function Photo({ photo }: { photo: HeroPhoto }) {
 }
 
 // Always takes the same space, even with no caption, so everyone's feet line up.
+// `w-0 min-w-full` stops the caption from widening its photo's column (a wide caption
+// would push the row off-screen); items-center lets longer text spill evenly both sides.
+// Two lines (name / price) until there's room for one.
 function Caption({ photo }: { photo: HeroPhoto }) {
   const { board } = useBid();
   const spot = photo.caption && spotById(photo.caption);
   const lot = photo.caption && board[photo.caption];
   return (
-    <p className="mt-3 h-10 whitespace-nowrap text-center text-sm sm:h-5">
+    <p className="mt-3 flex h-10 w-0 min-w-full flex-col items-center whitespace-nowrap text-sm lg:h-5 lg:flex-row lg:justify-center lg:gap-1">
       {spot && lot && (
         <>
-          <span className="block font-semibold sm:inline">{spot.name}</span>{" "}
-          <span className="font-mono font-bold text-money">{formatUsd(lot.highBid || spot.startingPrice)}</span>{" "}
-          <span className="text-xs text-muted">{lot.bidCount > 0 ? "top bid" : "to start"}</span>
+          <span className="font-semibold">{spot.name}</span>
+          <span>
+            <span className="font-mono font-bold text-money">{formatUsd(lot.highBid || spot.startingPrice)}</span>{" "}
+            <span className="text-xs text-muted">{lot.bidCount > 0 ? "top bid" : "to start"}</span>
+          </span>
         </>
       )}
     </p>

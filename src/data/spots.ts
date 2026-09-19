@@ -90,6 +90,12 @@ export const SPOTS: Spot[] = [
 ];
 
 export const CAMPAIGN = {
+  // Headline and tagline are shared by the page, the tab title, the link-preview text
+  // and the generated share banner (src/app/opengraph-image.tsx). Edit them here only.
+  headline: "Put your brand on my blazer, my bag, or both.",
+  headlineAccent: "both.", // word(s) shown in italics
+  // "\n" = where the line breaks in the black strip; elsewhere it's read as a space.
+  tagline: ["Everyone is buying visibility.", "I'm creating something\npeople notice."],
   name: "Jigyasa",
   handle: "@jigyasa_0203",
   twitter: "https://x.com/jigyasa_0203",
@@ -131,6 +137,12 @@ export const minNextBid = (spot: Spot, lot: LotState) =>
   lot.highBid > 0 ? lot.highBid + spot.minIncrement : spot.startingPrice;
 
 export const isOpen = (lot: LotState, now = Date.now()) => lot.status === "open" && now < Date.parse(lot.endsAt);
+
+// e.g. "Sep 30", in Singapore time, from BIDDING_ENDS_AT.
+export const deadlineLabel = () =>
+  new Date(BIDDING_ENDS_AT).toLocaleDateString("en-US", { timeZone: "Asia/Singapore", month: "short", day: "numeric" });
+
+export const taglineText = () => CAMPAIGN.tagline.join(" ").replace(/\n/g, " ");
 
 export const formatUsd = (n: number) => `$${n.toLocaleString("en-US")}`;
 export const spotById = (id: string) => SPOTS.find((s) => s.id === id);

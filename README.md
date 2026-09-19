@@ -49,6 +49,16 @@ whichever is higher wins. Set `spots.status = 'sold'` on the winning lot(s).
 logo-box positions (percent of each photo). Keep prices/deadline in sync with the SQL seed.
 Photos live in `public/looks/`; the Blazer + Bag photo is a placeholder until the real one arrives.
 
+## Headline, tagline, deadline and the link preview
+
+The headline, tagline and bidding deadline live in `src/data/spots.ts` (`CAMPAIGN` and
+`BIDDING_ENDS_AT`). The page, tab title, preview text and the share banner
+(`src/app/opengraph-image.tsx`, drawn at build time) all read them from there, so an edit
+there updates everything on the next deploy. If you change the deadline, also update
+`ends_at` in the `spots` table so the database enforces the same time.
+
 ## Fonts
 
 Instrument Serif (headings) and JetBrains Mono (numbers) via Google Fonts; Satoshi (body) is self-hosted from Fontshare under the ITF Free Font License (`src/app/fonts/Satoshi-LICENSE.txt`).
+
+The share banner uses TTF/OTF copies in `src/og/` (Instrument Serif under the SIL Open Font License, `src/og/InstrumentSerif-OFL.txt`; Satoshi under the ITF licence above).
