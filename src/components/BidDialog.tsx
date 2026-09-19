@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "motion/react";
+import Image from "next/image";
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { placeBid, type BidState } from "@/app/actions";
-import { SPOTS, formatUsd, minNextBid, spotById, type Board, type Spot } from "@/data/spots";
+import { CAMPAIGN, SPOTS, formatUsd, minNextBid, spotById, type Board, type Spot } from "@/data/spots";
 
 type Props = {
   spot: Spot | null;
@@ -88,7 +89,7 @@ export function BidDialog({ spot, board, open, onClose, onPlaced }: Props) {
         </div>
 
         {state?.ok ? (
-          <div className="flex flex-1 flex-col items-start justify-center gap-4 px-6">
+          <div className="flex flex-1 flex-col justify-center gap-6 overflow-y-auto px-6 py-8">
             <span className="grid h-10 w-10 place-items-center rounded-full bg-money text-white">
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <motion.path
@@ -99,9 +100,67 @@ export function BidDialog({ spot, board, open, onClose, onPlaced }: Props) {
                 />
               </svg>
             </span>
-            <p className="font-display text-2xl font-medium tracking-[-0.03em]">{state.message}</p>
-            <button type="button" onClick={onClose} className="text-sm text-muted underline underline-offset-4 hover:text-fg">
-              Back to the page
+            <div>
+              <p className="font-display text-4xl leading-tight">{state.message}</p>
+              {state.spotName && <p className="mt-1 text-muted">Your bid on {state.spotName} is on the board now.</p>}
+            </div>
+
+            {/* who to talk to next: no payment on the site, it's all sorted over DM */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35, duration: 0.35 }}
+              className="rounded-lg border border-line bg-surface p-5"
+            >
+              <div className="flex items-center gap-3">
+                <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-chip">
+                  <Image src="/looks/outfit.webp" alt="" fill sizes="48px" className="origin-[50%_14%] scale-[2.2] object-cover object-[50%_12%]" />
+                </span>
+                <div>
+                  <p className="font-semibold">{CAMPAIGN.name}</p>
+                  <a
+                    href={CAMPAIGN.portfolio}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-accent hover:underline"
+                  >
+                    {CAMPAIGN.portfolioLabel}
+                  </a>
+                </div>
+              </div>
+              <p className="mt-4 text-sm text-muted">
+                No payment on the site. Drop me a DM so I know it&apos;s you, and I&apos;ll sort the rest out with the winner after Sep 30.
+              </p>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <a
+                  href={CAMPAIGN.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full bg-accent px-3 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-accent-deep"
+                >
+                  X <span className="font-normal opacity-80">{CAMPAIGN.handle}</span>
+                </a>
+                <a
+                  href={CAMPAIGN.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full border border-accent px-3 py-2.5 text-center text-sm font-semibold text-accent transition hover:bg-accent-soft"
+                >
+                  Instagram
+                </a>
+              </div>
+              <p className="mt-2 text-center font-mono text-[11px] text-muted">{CAMPAIGN.instagramHandle} on Instagram</p>
+            </motion.div>
+
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                document.getElementById("board")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="self-start text-sm text-muted underline underline-offset-4 hover:text-fg"
+            >
+              See the bid board
             </button>
           </div>
         ) : (
@@ -211,7 +270,7 @@ export function BidDialog({ spot, board, open, onClose, onPlaced }: Props) {
                 {pending ? "Placing bid…" : "Place bid"}
               </button>
               <p className="mt-3 text-center text-xs text-muted">
-                No payment now. You only pay if you win.
+                No payment here. If you win, we sort it out over DM.
               </p>
             </div>
           </form>

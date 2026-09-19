@@ -32,7 +32,7 @@ const FAQ = [
   },
   {
     q: "Do I pay when I bid?",
-    a: "Nope, you only pay if you win. I'll send an invoice after bidding closes. Bank transfer or USDC, whichever's easier for you.",
+    a: "Nope, there's no payment on the site. If you win, I'll DM you after Sep 30 and we'll sort it out. Bank transfer or USDC, whichever's easier for you.",
   },
   {
     q: "What kind of logo file do you need?",

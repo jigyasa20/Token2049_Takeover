@@ -8,26 +8,63 @@ const emptyBoard = (): Board =>
   ) as Board;
 
 // Sample bids so the bid board can be reviewed locally before Supabase is connected.
-// Never used in production.
+// Kept on globalThis so the page, the server action and /api/board (which Next may
+// load as separate module instances) all see the same list. Never used in production.
+type PreviewStore = { feed: FeedBid[] };
+const g = globalThis as typeof globalThis & { __previewBids?: PreviewStore };
+
+function previewStore(): PreviewStore {
+  if (!g.__previewBids) {
+    const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
+    g.__previewBids = {
+      feed: [
+        { id: "p1", spotId: "blazer", amount: 1000, at: hoursAgo(70), name: "Anonymous bidder #1", isPublic: false },
+        { id: "p2", spotId: "bag", amount: 800, at: hoursAgo(64), name: "Nimbus Labs", isPublic: true },
+        { id: "p3", spotId: "blazer", amount: 1150, at: hoursAgo(52), name: "Nimbus Labs", isPublic: true },
+        { id: "p4", spotId: "both", amount: 1600, at: hoursAgo(40), name: "Anonymous bidder #3", isPublic: false },
+        { id: "p5", spotId: "bag", amount: 900, at: hoursAgo(33), name: "Anonymous bidder #1", isPublic: false },
+        { id: "p6", spotId: "blazer", amount: 1300, at: hoursAgo(20), name: "Orbit Wallet", isPublic: true },
+        { id: "p7", spotId: "both", amount: 2000, at: hoursAgo(12), name: "Anonymous bidder #3", isPublic: false },
+        { id: "p8", spotId: "blazer", amount: 1450, at: hoursAgo(5), name: "Nimbus Labs", isPublic: true },
+        { id: "p9", spotId: "bag", amount: 1000, at: hoursAgo(2), name: "Orbit Wallet", isPublic: true },
+      ],
+    };
+  }
+  return g.__previewBids;
+}
+
 function previewData(): LiveData {
-  const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
-  const feed: FeedBid[] = [
-    { id: "p1", spotId: "blazer", amount: 1000, at: hoursAgo(70), name: "Anonymous bidder #1", isPublic: false },
-    { id: "p2", spotId: "bag", amount: 800, at: hoursAgo(64), name: "Nimbus Labs", isPublic: true },
-    { id: "p3", spotId: "blazer", amount: 1150, at: hoursAgo(52), name: "Nimbus Labs", isPublic: true },
-    { id: "p4", spotId: "both", amount: 1600, at: hoursAgo(40), name: "Anonymous bidder #3", isPublic: false },
-    { id: "p5", spotId: "bag", amount: 900, at: hoursAgo(33), name: "Anonymous bidder #1", isPublic: false },
-    { id: "p6", spotId: "blazer", amount: 1300, at: hoursAgo(20), name: "Orbit Wallet", isPublic: true },
-    { id: "p7", spotId: "both", amount: 2000, at: hoursAgo(12), name: "Anonymous bidder #3", isPublic: false },
-    { id: "p8", spotId: "blazer", amount: 1450, at: hoursAgo(5), name: "Nimbus Labs", isPublic: true },
-    { id: "p9", spotId: "bag", amount: 1000, at: hoursAgo(2), name: "Orbit Wallet", isPublic: true },
-  ];
+  const { feed } = previewStore();
   const board = emptyBoard();
   for (const b of feed) {
     board[b.spotId].highBid = Math.max(board[b.spotId].highBid, b.amount);
     board[b.spotId].bidCount++;
   }
-  return { board, feed, preview: true };
+  return { board, feed: [...feed], preview: true };
+}
+
+export const isPreviewMode = () => !getSupabaseAdmin() && process.env.NODE_ENV !== "production";
+
+// Local-only stand-in for the place_bid() SQL function: same minimum-bid rule.
+export function placePreviewBid(bid: { spotId: SpotId; amount: number; brand: string; showBrand: boolean }):
+  | { ok: true }
+  | { ok: false; minBid: number } {
+  const { board } = previewData();
+  const spot = SPOTS.find((s) => s.id === bid.spotId)!;
+  const high = board[bid.spotId].highBid;
+  const min = high > 0 ? high + spot.minIncrement : spot.startingPrice;
+  if (bid.amount < min) return { ok: false, minBid: min };
+
+  const store = previewStore();
+  store.feed.push({
+    id: `p${store.feed.length + 1}-${Date.now()}`,
+    spotId: bid.spotId,
+    amount: bid.amount,
+    at: new Date().toISOString(),
+    name: bid.showBrand ? bid.brand : "Anonymous bidder (you)",
+    isPublic: bid.showBrand,
+  });
+  return { ok: true };
 }
 
 // Current bids per lot plus the public bid history. Falls back to sample data in

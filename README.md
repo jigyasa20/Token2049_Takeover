@@ -13,7 +13,7 @@ cp .env.example .env.local   # fill in the client's Supabase URL + service role 
 npm run dev
 ```
 
-Without Supabase env vars, `npm run dev` shows **sample bids** on the bid board (labelled as such) so the design can be reviewed; production shows no bids. Placing a bid reports that it isn't connected.
+Without Supabase env vars, `npm run dev` shows **sample bids** on the bid board (labelled as such), and bids you place locally are added to them (in memory, reset on restart) so the whole flow can be tried. Production never uses sample data.
 
 ## Supabase setup (client's project)
 
@@ -27,6 +27,16 @@ Run `supabase/migrations/0001_spots_and_bids.sql` in the SQL editor. It creates:
 
 RLS is on with no public policies; the app talks to Supabase only from the server using the service role key.
 The page polls `/api/board` every 12s for new bids.
+
+There's no payment on the site. After a bid, the bidder sees Jigyasa's X, Instagram and
+portfolio so they can DM her; the winner is sorted out over DM after bidding closes.
+
+### Bid notifications (Telegram)
+
+Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` (see `.env.example`) and every new bid is
+sent to Jigyasa on Telegram: spot, amount, brand, name, email, handle and message. It's
+sent after the response, so bidders never wait on it, and a failed message never affects
+the bid.
 
 ### Picking winners
 

@@ -1,12 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { z } from "zod";
-import { SPOTS, formatUsd } from "@/data/spots";
+import { SPOTS, formatUsd, spotById, type SpotId } from "@/data/spots";
+import { isPreviewMode, placePreviewBid } from "@/lib/board";
+import { notifyNewBid } from "@/lib/notify";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 
 export type BidState =
-  | { ok: true; message: string; amount: number }
+  | { ok: true; message: string; amount: number; spotName: string }
   | { ok: false; message: string; errors?: Record<string, string[] | undefined>; minBid?: number }
   | null;
 
@@ -28,7 +31,7 @@ const emptyToUndefined = (v: FormDataEntryValue | null) =>
 
 export async function placeBid(_prev: BidState, formData: FormData): Promise<BidState> {
   // Honeypot: real people never fill this hidden field.
-  if (formData.get("website")) return { ok: true, message: "Bid received.", amount: 0 };
+  if (formData.get("website")) return { ok: true, message: "Bid received.", amount: 0, spotName: "" };
 
   const parsed = schema.safeParse({
     spot_id: formData.get("spot_id"),
@@ -45,13 +48,22 @@ export async function placeBid(_prev: BidState, formData: FormData): Promise<Bid
     return { ok: false, message: "A couple of things need fixing below.", errors: z.flattenError(parsed.error).fieldErrors };
   }
 
-  const supabase = getSupabaseAdmin();
-  if (!supabase) {
-    console.warn("[bid] Supabase env not set; bid not stored:", parsed.data);
-    return { ok: false, message: "Bidding isn't connected yet (Supabase env missing)." };
+  const d = parsed.data;
+  const spotId = d.spot_id as SpotId;
+
+  // Local development without Supabase: record the bid in the sample data instead.
+  if (isPreviewMode()) {
+    const res = placePreviewBid({ spotId, amount: d.amount, brand: d.brand, showBrand: d.show_brand });
+    if (!res.ok) return tooLow(res.minBid);
+    return placed(d, spotId);
   }
 
-  const d = parsed.data;
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
+    console.error("[bid] Supabase env not set; bid not stored");
+    return { ok: false, message: "Bidding isn't connected yet. DM me and I'll note your bid." };
+  }
+
   const { error } = await supabase.rpc("place_bid", {
     p_spot_id: d.spot_id,
     p_amount: d.amount,
@@ -64,26 +76,45 @@ export async function placeBid(_prev: BidState, formData: FormData): Promise<Bid
   });
 
   if (error) {
-    const tooLow = error.message.match(/BID_TOO_LOW:(\d+)/);
-    if (tooLow) {
-      const min = Number(tooLow[1]);
-      revalidatePath("/");
-      return {
-        ok: false,
-        minBid: min,
-        message: `Someone got there first. The minimum bid is now ${formatUsd(min)}.`,
-        errors: { amount: [`At least ${formatUsd(min)}`] },
-      };
-    }
+    const low = error.message.match(/BID_TOO_LOW:(\d+)/);
+    if (low) return tooLow(Number(low[1]));
     if (error.message.includes("BIDDING_CLOSED")) return { ok: false, message: "Bidding on this spot is closed, sorry!" };
     console.error("[bid] place_bid failed", error);
     return { ok: false, message: "Something broke on my end. Try again, or just DM me." };
   }
 
+  return placed(d, spotId);
+}
+
+function tooLow(min: number): BidState {
+  revalidatePath("/");
+  return {
+    ok: false,
+    minBid: min,
+    message: `Someone got there first. The minimum bid is now ${formatUsd(min)}.`,
+    errors: { amount: [`At least ${formatUsd(min)}`] },
+  };
+}
+
+function placed(d: z.infer<typeof schema>, spotId: SpotId): BidState {
+  // Ping Jigyasa after the response is sent, so the bidder isn't kept waiting.
+  after(() =>
+    notifyNewBid({
+      spotId,
+      amount: d.amount,
+      brand: d.brand,
+      name: d.name,
+      email: d.email,
+      handle: d.handle,
+      message: d.message,
+      showBrand: d.show_brand,
+    }),
+  );
   revalidatePath("/");
   return {
     ok: true,
     amount: d.amount,
-    message: `You're in the lead at ${formatUsd(d.amount)}! Someone could still outbid you before Sep 30, so check back. I'll reach out if you win.`,
+    spotName: spotById(spotId)?.name ?? "",
+    message: `You're in the lead at ${formatUsd(d.amount)}!`,
   };
 }

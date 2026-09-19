@@ -1,16 +1,14 @@
 "use client";
 
-import { motion } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
-import { BidButton } from "./BidProvider";
 
-// Demo only: shows what a fully branded look could be. Add more brands here as mockups arrive.
+// Demo only: shows what a branded blazer + bag could look like. Coca-Cola is just the example.
 const BRANDS = [
   {
     id: "cocacola",
     name: "Coca-Cola",
-    src: "/looks/demo-cocacola.webp",
+    src: "/looks/cocacola-blazer-bag.webp",
     icon: (
       <span className="grid h-full w-full place-items-center rounded-full bg-[#e41e2b] font-display text-[11px] font-semibold italic tracking-[-0.02em] text-white">
         Coca‑Cola
@@ -19,7 +17,11 @@ const BRANDS = [
   },
 ];
 
-const BASE = "/looks/outfit.webp";
+const BASE = "/looks/blazer-bag.webp";
+
+// Both cut-outs sit in a box shaped like the wider (branded) photo; object-contain +
+// object-bottom keeps her the same height and standing on the same line in each.
+const FRAME_RATIO = "986 / 1522";
 
 export function BrandDemo() {
   const [active, setActive] = useState<string | null>(null);
@@ -27,44 +29,41 @@ export function BrandDemo() {
 
   return (
     <div className="grid items-center gap-8 rounded-lg border border-line bg-surface p-4 sm:p-8 md:grid-cols-[minmax(0,320px)_1fr] md:gap-12">
-      <div className="relative mx-auto aspect-[9/16] w-full max-w-[320px] overflow-hidden rounded-xl bg-chip">
-        <Image src={BASE} alt="Jigyasa, plain outfit" fill sizes="320px" className="object-cover" />
-        {/* the branded look wipes down over the plain one, like putting the jacket on */}
-        {BRANDS.map((b) => {
-          const on = active === b.id;
-          return (
-            <motion.div
-              key={b.id}
-              className="absolute inset-0"
-              initial={false}
-              animate={{ clipPath: on ? "inset(0% 0% 0% 0%)" : "inset(0% 0% 100% 0%)" }}
-              transition={{ duration: 0.9, ease: [0.65, 0, 0.35, 1] }}
-            >
-              <Image src={b.src} alt={`Jigyasa wearing a ${b.name} branded outfit`} fill sizes="320px" className="object-cover" />
-            </motion.div>
-          );
-        })}
-        {/* bright edge that travels with the wipe */}
-        <motion.span
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 h-[2px] bg-white"
-          initial={false}
-          animate={brand ? { top: ["0%", "100%"], opacity: [1, 1, 0] } : { top: ["100%", "0%"], opacity: [1, 1, 0] }}
-          transition={{ duration: 0.9, ease: [0.65, 0, 0.35, 1] }}
-          style={{ opacity: 0 }}
+      {/* No frame and no transition: exactly one photo is shown at a time. Both stay in
+          the page (the other is just hidden) so the swap is instant. */}
+      <div className="relative mx-auto w-full max-w-[320px]" style={{ aspectRatio: FRAME_RATIO }}>
+        <Image
+          src={BASE}
+          alt="Jigyasa in the plain black blazer, carrying the blank white bag"
+          fill
+          loading="eager"
+          sizes="320px"
+          className={`object-contain object-bottom ${brand ? "invisible" : ""}`}
         />
+        {BRANDS.map((b) => (
+          <Image
+            key={b.id}
+            src={b.src}
+            alt={`Jigyasa with a ${b.name} branded blazer and bag`}
+            fill
+            loading="eager"
+            sizes="320px"
+            className={`object-contain object-bottom ${active === b.id ? "" : "invisible"}`}
+          />
+        ))}
         <span className="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-fg">
           {brand ? `${brand.name} (mockup)` : "Before"}
         </span>
       </div>
 
       <div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-accent">Try it on</p>
+        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-accent">Example</p>
         <h3 className="mt-2 font-display text-4xl sm:text-5xl">
-          Tap the logo, see it <em>on me</em>
+          This is how your brand will look <em>on me</em>
         </h3>
         <p className="mt-3 max-w-md text-muted">
-          Here&apos;s a Coca-Cola version I mocked up so you can picture it (they&apos;re not a sponsor, just an example). Tap it to swap outfits, tap again to go back.
+          I used Coca-Cola as the example, on both the blazer and the bag. They&apos;re not a sponsor, it&apos;s just a mockup. Tap the
+          logo to see it, tap again to go back.
         </p>
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -82,11 +81,6 @@ export function BrandDemo() {
               {b.icon}
             </button>
           ))}
-          <BidButton className="grid h-16 w-16 place-items-center rounded-full border border-dashed border-muted/60 text-center font-mono text-[10px] leading-tight text-muted transition hover:border-fg hover:text-fg">
-            your
-            <br />
-            brand?
-          </BidButton>
         </div>
 
         {brand && (

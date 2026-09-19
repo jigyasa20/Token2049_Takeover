@@ -12,9 +12,40 @@ export type Spot = {
   blurb: string;
   startingPrice: number;
   minIncrement: number;
-  photo: { src: string; width: number; height: number; placeholder?: boolean };
-  boxes: Box[]; // highlighted placement(s) on the photo
 };
+
+// The two cut-out photos in the hero. Each dashed box marks a spot and opens the
+// bid form for it. `caption` is the lot whose price shows under the photo.
+export type HeroPhoto = {
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+  boxes: (Box & { spot: SpotId })[];
+  caption: SpotId;
+};
+
+export const HERO_PHOTOS: HeroPhoto[] = [
+  {
+    src: "/looks/blazer.webp",
+    width: 375,
+    height: 1131,
+    alt: "Jigyasa in the black blazer",
+    boxes: [{ spot: "blazer", x: 38, y: 21, w: 42, h: 24 }],
+    caption: "blazer",
+  },
+  {
+    src: "/looks/blazer-bag.webp",
+    width: 936,
+    height: 1668,
+    alt: "Jigyasa in the black blazer carrying the big white bag",
+    boxes: [
+      { spot: "blazer", x: 62, y: 20, w: 28, h: 20 },
+      { spot: "bag", x: 10, y: 42, w: 38, h: 26 },
+    ],
+    caption: "bag",
+  },
+];
 
 // 30 Sep 2026, 23:59 Singapore time
 export const BIDDING_ENDS_AT = "2026-09-30T23:59:59+08:00";
@@ -27,8 +58,6 @@ export const SPOTS: Spot[] = [
     blurb: "Your brand, big and centred on my black blazer. If someone takes a photo of me, you're in it.",
     startingPrice: 1000,
     minIncrement: 50,
-    photo: { src: "/looks/blazer.webp", width: 720, height: 1280 },
-    boxes: [{ x: 30, y: 24, w: 40, h: 29 }],
   },
   {
     id: "bag",
@@ -37,8 +66,6 @@ export const SPOTS: Spot[] = [
     blurb: "A huge blank bag I'll be carrying around all day. Hard to miss, and easy to read from across the hall.",
     startingPrice: 800,
     minIncrement: 50,
-    photo: { src: "/looks/bag-blank.webp", width: 736, height: 981 },
-    boxes: [{ x: 10, y: 36, w: 58, h: 44 }],
   },
   {
     id: "both",
@@ -47,12 +74,6 @@ export const SPOTS: Spot[] = [
     blurb: "Blazer and bag, same brand. You'd be the only logo on me all day.",
     startingPrice: 1600,
     minIncrement: 50,
-    // TODO: replace with the photo of her in the blazer holding the bag
-    photo: { src: "/looks/blazer.webp", width: 720, height: 1280, placeholder: true },
-    boxes: [
-      { x: 30, y: 24, w: 40, h: 29 },
-      { x: 18, y: 52, w: 34, h: 20 },
-    ],
   },
 ];
 
@@ -60,6 +81,7 @@ export const CAMPAIGN = {
   name: "Jigyasa",
   handle: "@jigyasa_0203",
   twitter: "https://x.com/jigyasa_0203",
+  instagramHandle: "@jigyasa_vaishnv_",
   instagram: "https://instagram.com/jigyasa_vaishnv_",
   youtube: "https://youtube.com/@StoriesbyRaahi",
   portfolio: "https://jigyasav.vercel.app/",
