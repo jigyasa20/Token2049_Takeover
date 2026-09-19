@@ -14,10 +14,10 @@ export const revalidate = 30;
 
 // TODO: confirm deliverables with Jigyasa
 const PERKS = [
-  "Your logo printed on the blazer or the bag, and on me for the whole day",
+  "Your brand printed on the blazer or the bag, and on me for the whole day",
   "A short video and a recap video from the event, plus a tweet with photos",
   "A shoutout and a tag in my thank-you post",
-  "People will ask me about your logo. I'll tell them about you",
+  "People will ask me about your brand. I'll tell them about you",
   "The posts stay up after the event, so people keep seeing them",
 ];
 
@@ -100,7 +100,7 @@ export default async function Home() {
             </span>
           </p>
           <RevealHeadline
-            text="Put your logo on my blazer, my bag, or both."
+            text="Put your brand on my blazer, my bag, or both."
             accent={["both."]}
             className="mx-auto mt-4 max-w-3xl text-balance font-display text-5xl leading-[1.02] tracking-[-0.01em] sm:text-7xl"
           />
@@ -168,8 +168,8 @@ export default async function Home() {
             </h2>
             <p className="mt-4 max-w-2xl text-lg leading-8 text-muted">
               Pick the blazer, the bag, or both, and put in a bid. Anyone can outbid you until Sep 30, so keep an eye on the board.
-              Whoever&apos;s on top at the end wins. I&apos;ll get in touch, you send me your logo, I get it printed, and then I wear it
-              around TOKEN2049 all day.
+              Whoever&apos;s on top at the end wins. I&apos;ll get in touch, you send me your brand files, I get them printed, and then I wear
+              your brand around TOKEN2049 all day.
             </p>
             <div className="mt-8">
               <BrandDemo />

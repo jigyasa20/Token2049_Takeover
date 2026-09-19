@@ -24,10 +24,10 @@ export const SPOTS: Spot[] = [
     id: "blazer",
     name: "The Blazer",
     kicker: "1 brand",
-    blurb: "Your logo, big and centred on my black blazer. If someone takes a photo of me, you're in it.",
+    blurb: "Your brand, big and centred on my black blazer. If someone takes a photo of me, you're in it.",
     startingPrice: 1000,
     minIncrement: 50,
-    photo: { src: "/looks/outfit.webp", width: 720, height: 1280 },
+    photo: { src: "/looks/blazer.webp", width: 720, height: 1280 },
     boxes: [{ x: 30, y: 24, w: 40, h: 29 }],
   },
   {
@@ -37,7 +37,7 @@ export const SPOTS: Spot[] = [
     blurb: "A huge blank bag I'll be carrying around all day. Hard to miss, and easy to read from across the hall.",
     startingPrice: 800,
     minIncrement: 50,
-    photo: { src: "/looks/bag.png", width: 736, height: 981 },
+    photo: { src: "/looks/bag-blank.webp", width: 736, height: 981 },
     boxes: [{ x: 10, y: 36, w: 58, h: 44 }],
   },
   {
@@ -48,7 +48,7 @@ export const SPOTS: Spot[] = [
     startingPrice: 1600,
     minIncrement: 50,
     // TODO: replace with the photo of her in the blazer holding the bag
-    photo: { src: "/looks/outfit.webp", width: 720, height: 1280, placeholder: true },
+    photo: { src: "/looks/blazer.webp", width: 720, height: 1280, placeholder: true },
     boxes: [
       { x: 30, y: 24, w: 40, h: 29 },
       { x: 18, y: 52, w: 34, h: 20 },

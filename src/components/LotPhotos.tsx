@@ -11,7 +11,7 @@ function LogoBox({ box }: { box: Box }) {
       style={{ left: `${box.x}%`, top: `${box.y}%`, width: `${box.w}%`, height: `${box.h}%` }}
     >
       <span className="rounded bg-white px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.08em] text-fg sm:text-[10px]">
-        your logo
+        your brand
       </span>
     </span>
   );

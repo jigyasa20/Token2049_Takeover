@@ -85,7 +85,7 @@ export function BrandDemo() {
           <BidButton className="grid h-16 w-16 place-items-center rounded-full border border-dashed border-muted/60 text-center font-mono text-[10px] leading-tight text-muted transition hover:border-fg hover:text-fg">
             your
             <br />
-            logo?
+            brand?
           </BidButton>
         </div>
 
