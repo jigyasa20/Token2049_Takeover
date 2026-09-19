@@ -8,7 +8,7 @@ const BRANDS = [
   {
     id: "cocacola",
     name: "Coca-Cola",
-    src: "/looks/cocacola-blazer-bag.webp",
+    src: "/looks/cocacola-look.webp",
     icon: (
       <span className="grid h-full w-full place-items-center rounded-full bg-[#e41e2b] font-display text-[11px] font-semibold italic tracking-[-0.02em] text-white">
         Coca‑Cola
@@ -17,11 +17,11 @@ const BRANDS = [
   },
 ];
 
-const BASE = "/looks/blazer-bag.webp";
+const BASE = "/looks/blazer-bag-plain.webp";
 
-// Both cut-outs sit in a box shaped like the wider (branded) photo; object-contain +
-// object-bottom keeps her the same height and standing on the same line in each.
-const FRAME_RATIO = "986 / 1522";
+// The plain and branded photos are the same shot cropped identically, so they swap
+// in place with nothing shifting.
+const FRAME_RATIO = "941 / 1670";
 
 export function BrandDemo() {
   const [active, setActive] = useState<string | null>(null);
@@ -29,8 +29,8 @@ export function BrandDemo() {
 
   return (
     <div className="grid items-center gap-8 rounded-lg border border-line bg-surface p-4 sm:p-8 md:grid-cols-[minmax(0,320px)_1fr] md:gap-12">
-      {/* No frame and no transition: exactly one photo is shown at a time. Both stay in
-          the page (the other is just hidden) so the swap is instant. */}
+      {/* No frame. The plain photo always stays in place; the branded one fades in and out
+          on top of it. Both are the same shot cropped identically, so nothing shifts. */}
       <div className="relative mx-auto w-full max-w-[320px]" style={{ aspectRatio: FRAME_RATIO }}>
         <Image
           src={BASE}
@@ -38,7 +38,7 @@ export function BrandDemo() {
           fill
           loading="eager"
           sizes="320px"
-          className={`object-contain object-bottom ${brand ? "invisible" : ""}`}
+          className="object-contain object-bottom"
         />
         {BRANDS.map((b) => (
           <Image
@@ -48,7 +48,9 @@ export function BrandDemo() {
             fill
             loading="eager"
             sizes="320px"
-            className={`object-contain object-bottom ${active === b.id ? "" : "invisible"}`}
+            className={`object-contain object-bottom transition-opacity duration-700 ease-in-out motion-reduce:transition-none ${
+              active === b.id ? "opacity-100" : "opacity-0"
+            }`}
           />
         ))}
         <span className="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-fg">

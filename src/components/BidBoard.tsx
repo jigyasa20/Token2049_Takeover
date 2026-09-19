@@ -184,7 +184,7 @@ function BidList({ bids }: { bids: FeedBid[] }) {
                 <p className={`truncate text-sm ${isTop ? "font-semibold text-fg" : b.isPublic ? "text-fg" : "text-muted"}`}>
                   {b.name}
                   {isTop && (
-                    <span className="ml-2 rounded-full bg-lemon px-1.5 py-0.5 align-middle font-mono text-[9px] font-bold uppercase tracking-[0.08em] text-fg">
+                    <span className="ml-2 rounded-full bg-highlight px-1.5 py-0.5 align-middle font-mono text-[9px] font-bold uppercase tracking-[0.08em] text-fg">
                       Leading
                     </span>
                   )}

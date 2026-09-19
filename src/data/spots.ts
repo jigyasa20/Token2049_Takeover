@@ -14,15 +14,18 @@ export type Spot = {
   minIncrement: number;
 };
 
-// The two cut-out photos in the hero. Each dashed box marks a spot and opens the
-// bid form for it. `caption` is the lot whose price shows under the photo.
+// The cut-out photos in the hero, left to right. Each dashed box marks a spot and
+// opens the bid form for it. `caption` is the lot whose price shows under the photo.
+// `scale` shrinks an item relative to her height (1 = full height); it sits on the
+// same baseline as her feet.
 export type HeroPhoto = {
   src: string;
   width: number;
   height: number;
   alt: string;
   boxes: (Box & { spot: SpotId })[];
-  caption: SpotId;
+  caption?: SpotId;
+  scale?: number;
 };
 
 export const HERO_PHOTOS: HeroPhoto[] = [
@@ -35,15 +38,24 @@ export const HERO_PHOTOS: HeroPhoto[] = [
     caption: "blazer",
   },
   {
-    src: "/looks/blazer-bag.webp",
-    width: 936,
-    height: 1668,
+    src: "/looks/bag.webp",
+    width: 1178,
+    height: 1199,
+    alt: "The big blank white bag",
+    boxes: [{ spot: "bag", x: 14, y: 34, w: 60, h: 44 }],
+    caption: "bag",
+    scale: 0.55,
+  },
+  {
+    src: "/looks/blazer-bag-plain.webp",
+    width: 941,
+    height: 1670,
     alt: "Jigyasa in the black blazer carrying the big white bag",
     boxes: [
       { spot: "blazer", x: 62, y: 20, w: 28, h: 20 },
       { spot: "bag", x: 10, y: 42, w: 38, h: 26 },
     ],
-    caption: "bag",
+    caption: "both",
   },
 ];
 

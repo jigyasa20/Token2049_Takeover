@@ -53,7 +53,7 @@ export function CalloutStrip({ title, sub }: { title: string; sub: string }) {
       <motion.p style={{ x: x1 }} className="font-display text-5xl text-canvas sm:text-7xl">
         {title}
       </motion.p>
-      <motion.p style={{ x: x2 }} className="mt-2 font-display text-2xl italic text-lemon sm:text-4xl">
+      <motion.p style={{ x: x2 }} className="mt-2 font-display text-2xl italic text-highlight sm:text-4xl">
         {sub}
       </motion.p>
     </section>

@@ -49,7 +49,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 function Highlight({ children }: { children: React.ReactNode }) {
-  return <span className="whitespace-nowrap rounded-sm bg-lemon/70 px-1.5 font-semibold text-fg">{children}</span>;
+  return <span className="whitespace-nowrap rounded-sm bg-highlight/70 px-1.5 font-semibold text-fg">{children}</span>;
 }
 
 export default async function Home() {
