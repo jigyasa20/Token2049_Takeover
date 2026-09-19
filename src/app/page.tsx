@@ -12,14 +12,23 @@ import { getLiveData } from "@/lib/board";
 // Bids change often; re-check at most every 30s (a placed bid revalidates immediately).
 export const revalidate = 30;
 
-const PERKS = [
+// A perk is either a single line, or a heading with a list of items under it.
+const PERKS: (string | { title: string; items: string[] })[] = [
   "Your brand printed on the blazer or the bag, and on me for the whole day",
-  "1 announcement video",
-  "1 founder interview",
-  "2 short videos",
-  "An Instagram travel vlog",
-  "An event recap",
-  "A sponsor thank-you post",
+  {
+    title: "Content from the event:",
+    items: [
+      "1 announcement video",
+      "1 founder interview",
+      "2 short videos",
+      "An Instagram travel vlog",
+      "An event recap",
+      "A sponsor thank-you post",
+    ],
+  },
+  "A shoutout and a tag in my thank-you post",
+  "People will ask me about your brand. I'll tell them about you",
+  "The posts stay up after the event, so people keep seeing them",
 ];
 
 const FAQ = [
@@ -202,9 +211,20 @@ export default async function Home() {
             </h2>
             <ul className="mt-8 divide-y divide-line rounded-lg border border-line bg-surface">
               {PERKS.map((p) => (
-                <li key={p} className="flex gap-3 px-5 py-4">
+                <li key={typeof p === "string" ? p : p.title} className="flex gap-3 px-5 py-4">
                   <span className="font-bold text-money">✓</span>
-                  <span>{p}</span>
+                  {typeof p === "string" ? (
+                    <span>{p}</span>
+                  ) : (
+                    <div>
+                      <span>{p.title}</span>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-muted marker:text-highlight">
+                        {p.items.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
