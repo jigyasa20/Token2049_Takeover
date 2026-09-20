@@ -6,7 +6,7 @@ import { Countdown } from "@/components/Countdown";
 import { LotPhotos } from "@/components/LotPhotos";
 import { CalloutStrip, Reveal, RevealHeadline } from "@/components/Motion";
 import { SpotList } from "@/components/SpotList";
-import { BIDDING_ENDS_AT, CAMPAIGN, SPOTS, deadlineLabel, formatUsd } from "@/data/spots";
+import { BIDDING_ENDS_AT, CAMPAIGN, SPOTS, deadlineLabel } from "@/data/spots";
 import { getLiveData } from "@/lib/board";
 
 // Bids change often; re-check at most every 30s (a placed bid revalidates immediately).
@@ -33,7 +33,7 @@ const PERKS: (string | { title: string; items: string[] })[] = [
 const FAQ = [
   {
     q: "How does bidding work?",
-    a: `Each spot has a starting price. To bid, you have to go at least ${formatUsd(SPOTS[0].minIncrement)} over the current top bid. Bidding ends ${deadlineLabel()} at 11:59 PM Singapore time, and whoever's on top then wins.`,
+    a: `Each spot has a starting price, and the first bid can match it. After that every bid has to double the one before it, so the price climbs fast. Bidding ends ${deadlineLabel()} at 11:59 PM Singapore time, and whoever's on top then wins.`,
   },
   {
     q: "Someone bid on both spots. What happens to my blazer bid?",

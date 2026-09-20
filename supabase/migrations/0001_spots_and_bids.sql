@@ -5,7 +5,7 @@ create table if not exists public.spots (
   id             text primary key,               -- matches src/data/spots.ts: 'blazer' | 'bag' | 'both'
   name           text not null,
   starting_price integer not null check (starting_price > 0),  -- USD
-  min_increment  integer not null default 100 check (min_increment > 0),
+  bid_multiplier numeric not null default 2 check (bid_multiplier >= 1),  -- each bid doubles the last
   ends_at        timestamptz not null,
   status         text not null default 'open' check (status in ('open', 'closed', 'sold')),
   winner_bid_id  uuid,
@@ -37,7 +37,7 @@ select
   s.id,
   s.status,
   s.starting_price,
-  s.min_increment,
+  s.bid_multiplier,
   s.ends_at,
   coalesce(max(b.amount), 0)::int as high_bid,
   count(b.id)::int                as bid_count
@@ -68,6 +68,8 @@ join bidders bd on bd.email = b.email;
 -- win at the same amount. Errors are raised with a stable code prefix the app maps
 -- to friendly messages:
 --   SPOT_NOT_FOUND | BIDDING_CLOSED | BID_TOO_LOW:<minimum>
+-- The first bid may match the starting price; every bid after that must be at least
+-- double the current top bid.
 create or replace function public.place_bid(
   p_spot_id text,
   p_amount  integer,
@@ -97,7 +99,7 @@ begin
   end if;
 
   select max(amount) into v_high from public.bids where spot_id = p_spot_id;
-  v_min := case when v_high is null then v_spot.starting_price else v_high + v_spot.min_increment end;
+  v_min := case when v_high is null then v_spot.starting_price else ceil(v_high * v_spot.bid_multiplier)::integer end;
 
   if p_amount < v_min then
     raise exception 'BID_TOO_LOW:%', v_min;
@@ -115,10 +117,10 @@ $$;
 -- Only the server (service role) may place bids.
 revoke all on function public.place_bid(text, integer, text, text, text, text, text, boolean) from public, anon, authenticated;
 
--- Prices are placeholders: keep in sync with src/data/spots.ts.
+-- Keep in sync with src/data/spots.ts (startingPrice, BID_MULTIPLIER).
 -- Deadline: 25 Sep 2026, 23:59 Singapore time.
-insert into public.spots (id, name, starting_price, min_increment, ends_at) values
-  ('blazer', 'The Blazer',     1200, 100, '2026-09-25 23:59:59+08'),
-  ('bag',    'The Bag',        1000, 100, '2026-09-25 23:59:59+08'),
-  ('both',   'Blazer + Bag',   2000, 100, '2026-09-25 23:59:59+08')
+insert into public.spots (id, name, starting_price, bid_multiplier, ends_at) values
+  ('blazer', 'The Blazer',     600, 2, '2026-09-25 23:59:59+08'),
+  ('bag',    'The Bag',        400, 2, '2026-09-25 23:59:59+08'),
+  ('both',   'Blazer + Bag',   900, 2, '2026-09-25 23:59:59+08')
 on conflict (id) do nothing;

@@ -11,7 +11,6 @@ export type Spot = {
   kicker: string;
   blurb: string;
   startingPrice: number;
-  minIncrement: number;
 };
 
 // The cut-out photos in the hero, left to right. Each dashed box marks a spot and
@@ -68,24 +67,21 @@ export const SPOTS: Spot[] = [
     name: "The Blazer",
     kicker: "1 brand",
     blurb: "Your brand, big and centred on my black blazer. If someone takes a photo of me, you're in it.",
-    startingPrice: 1200,
-    minIncrement: 100,
+    startingPrice: 600,
   },
   {
     id: "bag",
     name: "The Bag",
     kicker: "1 brand",
     blurb: "A huge blank bag I'll be carrying around all day. Hard to miss, and easy to read from across the hall.",
-    startingPrice: 1000,
-    minIncrement: 100,
+    startingPrice: 400,
   },
   {
     id: "both",
     name: "Blazer + Bag",
     kicker: "Whole outfit",
     blurb: "Blazer and bag, same brand. You'd be the only logo on me all day.",
-    startingPrice: 2000,
-    minIncrement: 100,
+    startingPrice: 900,
   },
 ];
 
@@ -133,8 +129,12 @@ export type LiveData = {
   preview: boolean; // true = sample data because Supabase isn't connected (dev only)
 };
 
+// Each new bid has to double the current top bid. The first bid is the starting price.
+// Keep in sync with bid_multiplier in the database (see place_bid()).
+export const BID_MULTIPLIER = 2;
+
 export const minNextBid = (spot: Spot, lot: LotState) =>
-  lot.highBid > 0 ? lot.highBid + spot.minIncrement : spot.startingPrice;
+  lot.highBid > 0 ? lot.highBid * BID_MULTIPLIER : spot.startingPrice;
 
 export const isOpen = (lot: LotState, now = Date.now()) => lot.status === "open" && now < Date.parse(lot.endsAt);
 

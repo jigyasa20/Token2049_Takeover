@@ -19,11 +19,11 @@ Without Supabase env vars, `npm run dev` shows **sample bids** on the bid board 
 
 Run `supabase/migrations/0001_spots_and_bids.sql` in the SQL editor. It creates:
 
-- `spots`: the three lots with starting price, minimum increment ($100) and deadline
+- `spots`: the three lots with starting price, bid multiplier (each bid doubles the last) and deadline
 - `bids`: every bid (brand, name, email, amount)
 - `spot_board`: public-safe view of top bid + bid count per lot
 - `bid_feed`: public bid history for the bid board (brand only if the bidder ticked "show my brand", otherwise "Anonymous bidder #n"; never names or emails)
-- `place_bid(...)`: locks the lot, checks the deadline and the minimum, then inserts the bid
+- `place_bid(...)`: locks the lot, checks the deadline and the minimum (double the top bid), then inserts the bid
 
 RLS is on with no public policies; the app talks to Supabase only from the server using the service role key.
 The page polls `/api/board` every 12s for new bids.

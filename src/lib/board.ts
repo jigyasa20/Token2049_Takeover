@@ -1,5 +1,5 @@
 import "server-only";
-import { BIDDING_ENDS_AT, SPOTS, type Board, type FeedBid, type LiveData, type SpotId } from "@/data/spots";
+import { BIDDING_ENDS_AT, SPOTS, minNextBid, type Board, type FeedBid, type LiveData, type SpotId } from "@/data/spots";
 import { getSupabaseAdmin } from "./supabase-server";
 
 const emptyBoard = (): Board =>
@@ -18,15 +18,14 @@ function previewStore(): PreviewStore {
     const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
     g.__previewBids = {
       feed: [
-        { id: "p1", spotId: "blazer", amount: 1200, at: hoursAgo(70), name: "Anonymous bidder #1", isPublic: false },
-        { id: "p2", spotId: "bag", amount: 1000, at: hoursAgo(64), name: "Nimbus Labs", isPublic: true },
-        { id: "p3", spotId: "blazer", amount: 1400, at: hoursAgo(52), name: "Nimbus Labs", isPublic: true },
-        { id: "p4", spotId: "both", amount: 2000, at: hoursAgo(40), name: "Anonymous bidder #3", isPublic: false },
-        { id: "p5", spotId: "bag", amount: 1200, at: hoursAgo(33), name: "Anonymous bidder #1", isPublic: false },
-        { id: "p6", spotId: "blazer", amount: 1600, at: hoursAgo(20), name: "Orbit Wallet", isPublic: true },
-        { id: "p7", spotId: "both", amount: 2400, at: hoursAgo(12), name: "Anonymous bidder #3", isPublic: false },
-        { id: "p8", spotId: "blazer", amount: 1800, at: hoursAgo(5), name: "Nimbus Labs", isPublic: true },
-        { id: "p9", spotId: "bag", amount: 1400, at: hoursAgo(2), name: "Orbit Wallet", isPublic: true },
+        { id: "p1", spotId: "blazer", amount: 600, at: hoursAgo(70), name: "Anonymous bidder #1", isPublic: false },
+        { id: "p2", spotId: "bag", amount: 400, at: hoursAgo(64), name: "Nimbus Labs", isPublic: true },
+        { id: "p3", spotId: "blazer", amount: 1200, at: hoursAgo(52), name: "Nimbus Labs", isPublic: true },
+        { id: "p4", spotId: "both", amount: 900, at: hoursAgo(40), name: "Anonymous bidder #3", isPublic: false },
+        { id: "p5", spotId: "bag", amount: 800, at: hoursAgo(33), name: "Anonymous bidder #1", isPublic: false },
+        { id: "p6", spotId: "blazer", amount: 2400, at: hoursAgo(20), name: "Orbit Wallet", isPublic: true },
+        { id: "p7", spotId: "both", amount: 1800, at: hoursAgo(12), name: "Anonymous bidder #3", isPublic: false },
+        { id: "p8", spotId: "bag", amount: 1600, at: hoursAgo(5), name: "Orbit Wallet", isPublic: true },
       ],
     };
   }
@@ -51,8 +50,7 @@ export function placePreviewBid(bid: { spotId: SpotId; amount: number; brand: st
   | { ok: false; minBid: number } {
   const { board } = previewData();
   const spot = SPOTS.find((s) => s.id === bid.spotId)!;
-  const high = board[bid.spotId].highBid;
-  const min = high > 0 ? high + spot.minIncrement : spot.startingPrice;
+  const min = minNextBid(spot, board[bid.spotId]);
   if (bid.amount < min) return { ok: false, minBid: min };
 
   const store = previewStore();
