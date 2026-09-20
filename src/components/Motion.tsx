@@ -50,10 +50,17 @@ export function CalloutStrip({ title, sub }: { title: string; sub: string }) {
 
   return (
     <section ref={ref} className="mt-16 overflow-hidden bg-accent py-14 text-center sm:py-20">
-      <motion.p style={{ x: x1 }} className="mx-auto max-w-5xl px-4 font-display text-4xl leading-[1.05] text-canvas sm:text-6xl">
+      {/* One line each, always: the font size shrinks with the viewport so neither wraps. */}
+      <motion.p
+        style={{ x: x1, fontSize: "clamp(1.05rem, 5.1vw, 4rem)" }}
+        className="whitespace-nowrap px-4 font-display leading-[1.1] text-canvas"
+      >
         {title}
       </motion.p>
-      <motion.p style={{ x: x2 }} className="mx-auto mt-3 max-w-5xl whitespace-pre-line px-4 font-display text-2xl italic leading-tight text-highlight sm:text-4xl">
+      <motion.p
+        style={{ x: x2, fontSize: "clamp(0.85rem, 4.2vw, 2.5rem)" }}
+        className="mt-3 whitespace-nowrap px-4 font-display italic leading-tight text-highlight"
+      >
         {sub}
       </motion.p>
     </section>

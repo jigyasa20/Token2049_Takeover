@@ -68,7 +68,7 @@ export const SPOTS: Spot[] = [
     name: "The Blazer",
     kicker: "1 brand",
     blurb: "Your brand, big and centred on my black blazer. If someone takes a photo of me, you're in it.",
-    startingPrice: 1000,
+    startingPrice: 1200,
     minIncrement: 100,
   },
   {
@@ -76,7 +76,7 @@ export const SPOTS: Spot[] = [
     name: "The Bag",
     kicker: "1 brand",
     blurb: "A huge blank bag I'll be carrying around all day. Hard to miss, and easy to read from across the hall.",
-    startingPrice: 800,
+    startingPrice: 1000,
     minIncrement: 100,
   },
   {
@@ -84,7 +84,7 @@ export const SPOTS: Spot[] = [
     name: "Blazer + Bag",
     kicker: "Whole outfit",
     blurb: "Blazer and bag, same brand. You'd be the only logo on me all day.",
-    startingPrice: 1600,
+    startingPrice: 2000,
     minIncrement: 100,
   },
 ];
@@ -94,8 +94,8 @@ export const CAMPAIGN = {
   // and the generated share banner (src/app/opengraph-image.tsx). Edit them here only.
   headline: "Put your brand on my blazer, my bag, or both.",
   headlineAccent: "both.", // word(s) shown in italics
-  // "\n" = where the line breaks in the black strip; elsewhere it's read as a space.
-  tagline: ["Everyone is buying visibility.", "I'm creating something\npeople notice."],
+  // Two lines in the black strip, one sentence each.
+  tagline: ["Everyone is buying visibility.", "I'm creating something people notice."],
   name: "Jigyasa",
   handle: "@jigyasa_0203",
   twitter: "https://x.com/jigyasa_0203",

@@ -118,7 +118,7 @@ revoke all on function public.place_bid(text, integer, text, text, text, text, t
 -- Prices are placeholders: keep in sync with src/data/spots.ts.
 -- Deadline: 25 Sep 2026, 23:59 Singapore time.
 insert into public.spots (id, name, starting_price, min_increment, ends_at) values
-  ('blazer', 'The Blazer',     1000, 100, '2026-09-25 23:59:59+08'),
-  ('bag',    'The Bag',         800, 100, '2026-09-25 23:59:59+08'),
-  ('both',   'Blazer + Bag',   1600, 100, '2026-09-25 23:59:59+08')
+  ('blazer', 'The Blazer',     1200, 100, '2026-09-25 23:59:59+08'),
+  ('bag',    'The Bag',        1000, 100, '2026-09-25 23:59:59+08'),
+  ('both',   'Blazer + Bag',   2000, 100, '2026-09-25 23:59:59+08')
 on conflict (id) do nothing;

@@ -18,15 +18,15 @@ function previewStore(): PreviewStore {
     const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
     g.__previewBids = {
       feed: [
-        { id: "p1", spotId: "blazer", amount: 1000, at: hoursAgo(70), name: "Anonymous bidder #1", isPublic: false },
-        { id: "p2", spotId: "bag", amount: 800, at: hoursAgo(64), name: "Nimbus Labs", isPublic: true },
-        { id: "p3", spotId: "blazer", amount: 1150, at: hoursAgo(52), name: "Nimbus Labs", isPublic: true },
-        { id: "p4", spotId: "both", amount: 1600, at: hoursAgo(40), name: "Anonymous bidder #3", isPublic: false },
-        { id: "p5", spotId: "bag", amount: 900, at: hoursAgo(33), name: "Anonymous bidder #1", isPublic: false },
-        { id: "p6", spotId: "blazer", amount: 1300, at: hoursAgo(20), name: "Orbit Wallet", isPublic: true },
-        { id: "p7", spotId: "both", amount: 2000, at: hoursAgo(12), name: "Anonymous bidder #3", isPublic: false },
-        { id: "p8", spotId: "blazer", amount: 1450, at: hoursAgo(5), name: "Nimbus Labs", isPublic: true },
-        { id: "p9", spotId: "bag", amount: 1000, at: hoursAgo(2), name: "Orbit Wallet", isPublic: true },
+        { id: "p1", spotId: "blazer", amount: 1200, at: hoursAgo(70), name: "Anonymous bidder #1", isPublic: false },
+        { id: "p2", spotId: "bag", amount: 1000, at: hoursAgo(64), name: "Nimbus Labs", isPublic: true },
+        { id: "p3", spotId: "blazer", amount: 1400, at: hoursAgo(52), name: "Nimbus Labs", isPublic: true },
+        { id: "p4", spotId: "both", amount: 2000, at: hoursAgo(40), name: "Anonymous bidder #3", isPublic: false },
+        { id: "p5", spotId: "bag", amount: 1200, at: hoursAgo(33), name: "Anonymous bidder #1", isPublic: false },
+        { id: "p6", spotId: "blazer", amount: 1600, at: hoursAgo(20), name: "Orbit Wallet", isPublic: true },
+        { id: "p7", spotId: "both", amount: 2400, at: hoursAgo(12), name: "Anonymous bidder #3", isPublic: false },
+        { id: "p8", spotId: "blazer", amount: 1800, at: hoursAgo(5), name: "Nimbus Labs", isPublic: true },
+        { id: "p9", spotId: "bag", amount: 1400, at: hoursAgo(2), name: "Orbit Wallet", isPublic: true },
       ],
     };
   }
