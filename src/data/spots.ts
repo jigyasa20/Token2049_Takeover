@@ -59,8 +59,8 @@ export const HERO_PHOTOS: HeroPhoto[] = [
   },
 ];
 
-// 30 Sep 2026, 23:59 Singapore time
-export const BIDDING_ENDS_AT = "2026-09-30T23:59:59+08:00";
+// 25 Sep 2026, 23:59 Singapore time
+export const BIDDING_ENDS_AT = "2026-09-25T23:59:59+08:00";
 
 export const SPOTS: Spot[] = [
   {
@@ -69,7 +69,7 @@ export const SPOTS: Spot[] = [
     kicker: "1 brand",
     blurb: "Your brand, big and centred on my black blazer. If someone takes a photo of me, you're in it.",
     startingPrice: 1000,
-    minIncrement: 50,
+    minIncrement: 100,
   },
   {
     id: "bag",
@@ -77,7 +77,7 @@ export const SPOTS: Spot[] = [
     kicker: "1 brand",
     blurb: "A huge blank bag I'll be carrying around all day. Hard to miss, and easy to read from across the hall.",
     startingPrice: 800,
-    minIncrement: 50,
+    minIncrement: 100,
   },
   {
     id: "both",
@@ -85,7 +85,7 @@ export const SPOTS: Spot[] = [
     kicker: "Whole outfit",
     blurb: "Blazer and bag, same brand. You'd be the only logo on me all day.",
     startingPrice: 1600,
-    minIncrement: 50,
+    minIncrement: 100,
   },
 ];
 

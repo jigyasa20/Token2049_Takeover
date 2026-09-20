@@ -19,7 +19,7 @@ Without Supabase env vars, `npm run dev` shows **sample bids** on the bid board 
 
 Run `supabase/migrations/0001_spots_and_bids.sql` in the SQL editor. It creates:
 
-- `spots`: the three lots with starting price, minimum increment ($50) and deadline
+- `spots`: the three lots with starting price, minimum increment ($100) and deadline
 - `bids`: every bid (brand, name, email, amount)
 - `spot_board`: public-safe view of top bid + bid count per lot
 - `bid_feed`: public bid history for the bid board (brand only if the bidder ticked "show my brand", otherwise "Anonymous bidder #n"; never names or emails)

@@ -6,7 +6,7 @@ import { Countdown } from "@/components/Countdown";
 import { LotPhotos } from "@/components/LotPhotos";
 import { CalloutStrip, Reveal, RevealHeadline } from "@/components/Motion";
 import { SpotList } from "@/components/SpotList";
-import { BIDDING_ENDS_AT, CAMPAIGN, SPOTS, deadlineLabel } from "@/data/spots";
+import { BIDDING_ENDS_AT, CAMPAIGN, SPOTS, deadlineLabel, formatUsd } from "@/data/spots";
 import { getLiveData } from "@/lib/board";
 
 // Bids change often; re-check at most every 30s (a placed bid revalidates immediately).
@@ -26,7 +26,6 @@ const PERKS: (string | { title: string; items: string[] })[] = [
       "A sponsor thank-you post",
     ],
   },
-  "A shoutout and a tag in my thank-you post",
   "People will ask me about your brand. I'll tell them about you",
   "The posts stay up after the event, so people keep seeing them",
 ];
@@ -34,7 +33,7 @@ const PERKS: (string | { title: string; items: string[] })[] = [
 const FAQ = [
   {
     q: "How does bidding work?",
-    a: `Each spot has a starting price. To bid, you have to go at least $50 over the current top bid. Bidding ends ${deadlineLabel()} at 11:59 PM Singapore time, and whoever's on top then wins.`,
+    a: `Each spot has a starting price. To bid, you have to go at least ${formatUsd(SPOTS[0].minIncrement)} over the current top bid. Bidding ends ${deadlineLabel()} at 11:59 PM Singapore time, and whoever's on top then wins.`,
   },
   {
     q: "Someone bid on both spots. What happens to my blazer bid?",
@@ -46,7 +45,11 @@ const FAQ = [
   },
   {
     q: "What kind of logo file do you need?",
-    a: "SVG, AI or PDF if you have it. A big transparent PNG works too. I'll send you a mockup before anything gets printed.",
+    a: "Send an SVG, AI or PDF if you have one. A big transparent PNG works too, and I'll send you a mockup to approve before anything gets made. These are proper custom pieces, not cheap prints: good materials, handmade detailing, and your logo done as embroidery, patches, custom lettering, your brand colours, metallic or 3D bits, even a slogan if you want one.",
+  },
+  {
+    q: "Can I keep the blazer afterwards?",
+    a: "Yes. Keep it as a one-off piece, wear it to your own events, or give it to someone.",
   },
   {
     q: "What if the event doesn't happen?",
@@ -266,6 +269,26 @@ export default async function Home() {
               </p>
             </div>
           </div>
+
+          <Reveal className="mt-4 rounded-lg border border-line bg-surface p-6 sm:p-8">
+            <h3 className="font-display text-4xl leading-none">How this started</h3>
+            <div className="mt-4 max-w-3xl space-y-3 text-muted">
+              <p>
+                As a model I can&apos;t represent a bunch of brands at once. Designers pay for exclusivity, so when I wear a collection,
+                that&apos;s the only thing I&apos;m representing. It got me thinking: why should an outfit carry 20 logos when it could
+                carry one or two and actually mean something?
+              </p>
+              <p>
+                Then I went to a crypto conference. Four days, more than 7,000 projects, and by the end nobody could remember who
+                they&apos;d met. So I decided to make something people can&apos;t walk past: a custom blazer and a statement bag built for
+                two brands, not twenty.
+              </p>
+              <p>
+                I&apos;m not after the usual promotion. I want the kind of thing people spot across the street, come over for a closer
+                look, and ask about. I&apos;ve spent years walking ramps. This time I&apos;m walking the streets.
+              </p>
+            </div>
+          </Reveal>
         </section>
 
         {/* FAQ */}

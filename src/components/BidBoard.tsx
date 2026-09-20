@@ -206,20 +206,19 @@ function BidList({ bids }: { bids: FeedBid[] }) {
 
 function CombinedDeal({ feedBy }: { feedBy: (id: SpotId) => FeedBid[] }) {
   const topOf = (id: SpotId) => feedBy(id).at(-1)?.amount ?? 0;
+  const blazer = topOf("blazer");
+  const bag = topOf("bag");
   const both = topOf("both");
-  const separate = topOf("blazer") + topOf("bag");
+  const separate = blazer + bag;
   const max = Math.max(both, separate, 1);
   const bothWins = both > separate;
   const nobody = both === 0 && separate === 0;
 
+  // One line per lot: the two single spots, then the bid for both.
   const rows = [
-    { label: "Bid for both", value: both, detail: both ? formatUsd(both) : "no bids", wins: !nobody && bothWins },
-    {
-      label: "Top blazer bid + top bag bid",
-      value: separate,
-      detail: `${formatUsd(topOf("blazer"))} + ${formatUsd(topOf("bag"))}`,
-      wins: !nobody && !bothWins,
-    },
+    { id: "blazer", label: "Top blazer bid", value: blazer, wins: !nobody && !bothWins },
+    { id: "bag", label: "Top bag bid", value: bag, wins: !nobody && !bothWins },
+    { id: "both", label: "Top bid for both", value: both, wins: !nobody && bothWins },
   ];
 
   return (
@@ -236,12 +235,11 @@ function CombinedDeal({ feedBy }: { feedBy: (id: SpotId) => FeedBid[] }) {
       </div>
       <div className="mt-4 space-y-3">
         {rows.map((r) => (
-          <div key={r.label}>
+          <div key={r.id}>
             <div className="mb-1 flex items-baseline justify-between gap-3 text-sm">
               <span className={r.wins ? "font-semibold" : "text-muted"}>{r.label}</span>
               <span className={`font-mono ${r.wins ? "font-bold text-money" : "text-muted"}`}>
-                {r.detail}
-                {r.value > 0 && r.detail.includes("+") && <span className="text-fg"> = {formatUsd(r.value)}</span>}
+                {r.value ? formatUsd(r.value) : "no bids"}
               </span>
             </div>
             <div className="h-2.5 overflow-hidden rounded-full bg-line">
@@ -256,6 +254,12 @@ function CombinedDeal({ feedBy }: { feedBy: (id: SpotId) => FeedBid[] }) {
           </div>
         ))}
       </div>
+      {!nobody && (
+        <p className="mt-4 text-sm text-muted">
+          Blazer and bag together come to <span className="font-mono font-semibold text-fg">{formatUsd(separate)}</span>, against{" "}
+          <span className="font-mono font-semibold text-fg">{formatUsd(both)}</span> for both spots in one bid.
+        </p>
+      )}
     </div>
   );
 }

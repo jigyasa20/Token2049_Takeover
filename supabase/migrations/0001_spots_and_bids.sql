@@ -5,7 +5,7 @@ create table if not exists public.spots (
   id             text primary key,               -- matches src/data/spots.ts: 'blazer' | 'bag' | 'both'
   name           text not null,
   starting_price integer not null check (starting_price > 0),  -- USD
-  min_increment  integer not null default 50 check (min_increment > 0),
+  min_increment  integer not null default 100 check (min_increment > 0),
   ends_at        timestamptz not null,
   status         text not null default 'open' check (status in ('open', 'closed', 'sold')),
   winner_bid_id  uuid,
@@ -116,9 +116,9 @@ $$;
 revoke all on function public.place_bid(text, integer, text, text, text, text, text, boolean) from public, anon, authenticated;
 
 -- Prices are placeholders: keep in sync with src/data/spots.ts.
--- Deadline: 30 Sep 2026, 23:59 Singapore time.
+-- Deadline: 25 Sep 2026, 23:59 Singapore time.
 insert into public.spots (id, name, starting_price, min_increment, ends_at) values
-  ('blazer', 'The Blazer',     1000, 50, '2026-09-30 23:59:59+08'),
-  ('bag',    'The Bag',         800, 50, '2026-09-30 23:59:59+08'),
-  ('both',   'Blazer + Bag',   1600, 50, '2026-09-30 23:59:59+08')
+  ('blazer', 'The Blazer',     1000, 100, '2026-09-25 23:59:59+08'),
+  ('bag',    'The Bag',         800, 100, '2026-09-25 23:59:59+08'),
+  ('both',   'Blazer + Bag',   1600, 100, '2026-09-25 23:59:59+08')
 on conflict (id) do nothing;
