@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -25,6 +26,7 @@ const FRAME_RATIO = "941 / 1670";
 
 export function BrandDemo() {
   const [active, setActive] = useState<string | null>(null);
+  const [tapped, setTapped] = useState(false); // hides the "click here" hint for good
   const brand = BRANDS.find((b) => b.id === active);
 
   return (
@@ -73,7 +75,10 @@ export function BrandDemo() {
             <button
               key={b.id}
               type="button"
-              onClick={() => setActive((cur) => (cur === b.id ? null : b.id))}
+              onClick={() => {
+                setTapped(true);
+                setActive((cur) => (cur === b.id ? null : b.id));
+              }}
               aria-pressed={active === b.id}
               aria-label={`Try ${b.name}`}
               className={`h-16 w-16 rounded-full p-1 transition hover:scale-[1.05] active:scale-[0.97] ${
@@ -83,13 +88,29 @@ export function BrandDemo() {
               {b.icon}
             </button>
           ))}
+
+          {/* nudge towards the logo until someone taps it */}
+          {!tapped && (
+            <motion.span
+              aria-hidden
+              className="flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.12em] text-accent"
+              initial={{ opacity: 0, x: 6 }}
+              animate={{ opacity: 1, x: [0, -6, 0] }}
+              transition={{ opacity: { duration: 0.3 }, x: { duration: 1.4, repeat: Infinity, ease: "easeInOut" } }}
+            >
+              <span className="text-base leading-none">←</span> click here
+            </motion.span>
+          )}
         </div>
 
-        {brand && (
-          <button type="button" onClick={() => setActive(null)} className="mt-5 text-sm text-muted underline underline-offset-4 hover:text-fg">
-            Back to plain
-          </button>
-        )}
+        {/* the row keeps its space whether or not the link is showing, so nothing shifts */}
+        <div className="mt-5 h-5">
+          {brand && (
+            <button type="button" onClick={() => setActive(null)} className="text-sm text-muted underline underline-offset-4 hover:text-fg">
+              Back to plain
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

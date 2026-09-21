@@ -3,22 +3,14 @@
 import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 
-// Headline: each word rises out of a mask, one after another, on page load.
+// Headline. Accent words are italic and in the accent colour; no entrance animation.
 export function RevealHeadline({ text, className, accent }: { text: string; className?: string; accent?: string[] }) {
-  const words = text.split(" ");
   return (
     <h1 className={className} aria-label={text}>
-      {words.map((w, i) => (
-        <span key={i} aria-hidden className="inline-block overflow-hidden pb-[0.08em] align-bottom">
-          <motion.span
-            className={`inline-block ${accent?.includes(w) ? "italic text-accent" : ""}`}
-            initial={{ y: "110%" }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 + i * 0.07 }}
-          >
-            {w}
-          </motion.span>
-          {i < words.length - 1 && " "}
+      {text.split(" ").map((w, i, all) => (
+        <span key={i} aria-hidden className={accent?.includes(w) ? "italic text-accent" : undefined}>
+          {w}
+          {i < all.length - 1 ? " " : ""}
         </span>
       ))}
     </h1>

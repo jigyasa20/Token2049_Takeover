@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useInView } from "motion/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SPOTS, formatUsd, isOpen, minNextBid, spotById, type FeedBid, type Spot, type SpotId } from "@/data/spots";
 import { AnimatedUsd } from "./AnimatedNumber";
 import { useBid } from "./BidProvider";
@@ -20,11 +20,27 @@ const fmtTime = (iso: string) =>
 
 const W = 640;
 const H = 260;
-const PAD = { l: 56, r: 20, t: 28, b: 30 };
+
+// The chart scales down with the card, so on a phone the labels would end up ~6px.
+// `compact` gives them bigger type (in chart units) and trims the padding to match.
+function useIsPhone() {
+  const [phone, setPhone] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const update = () => setPhone(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return phone;
+}
 
 function StepChart({ spot, bids }: { spot: Spot; bids: FeedBid[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
+  const phone = useIsPhone();
+  const PAD = phone ? { l: 86, r: 16, t: 34, b: 42 } : { l: 56, r: 20, t: 28, b: 30 };
+  const fs = { y: phone ? 20 : 11, x: phone ? 17 : 10 };
 
   const top = bids.at(-1);
   const times = bids.map((b) => Date.parse(b.at));
@@ -63,7 +79,7 @@ function StepChart({ spot, bids }: { spot: Spot; bids: FeedBid[] }) {
         {ticks.map((v) => (
           <g key={v}>
             <line x1={PAD.l} x2={W - PAD.r} y1={y(v)} y2={y(v)} stroke="var(--line)" />
-            <text x={PAD.l - 10} y={y(v)} textAnchor="end" dominantBaseline="middle" className="fill-muted font-mono text-[11px]">
+            <text x={PAD.l - 10} y={y(v)} textAnchor="end" dominantBaseline="middle" fontSize={fs.y} className="fill-muted font-mono">
               {formatUsd(Math.round(v))}
             </text>
           </g>
@@ -79,18 +95,18 @@ function StepChart({ spot, bids }: { spot: Spot; bids: FeedBid[] }) {
           strokeDasharray="4 5"
           opacity={0.6}
         />
-        <text x={W - PAD.r} y={y(lo) + 16} textAnchor="end" className="fill-muted font-mono text-[10px]">
+        <text x={W - PAD.r} y={y(lo) + fs.x + 6} textAnchor="end" fontSize={fs.x} className="fill-muted font-mono">
           starting bid
         </text>
 
         {/* x labels */}
         {bids.length > 0 && (
           <>
-            <text x={x(first)} y={H - 8} className="fill-muted font-mono text-[10px]">
+            <text x={x(first)} y={H - 8} fontSize={fs.x} className="fill-muted font-mono">
               {fmtTime(bids[0].at)}
             </text>
             {bids.length > 1 && (
-              <text x={x(last)} y={H - 8} textAnchor="end" className="fill-muted font-mono text-[10px]">
+              <text x={x(last)} y={H - 8} textAnchor="end" fontSize={fs.x} className="fill-muted font-mono">
                 {fmtTime(top!.at)}
               </text>
             )}
@@ -103,7 +119,7 @@ function StepChart({ spot, bids }: { spot: Spot; bids: FeedBid[] }) {
             d={path}
             fill="none"
             stroke="var(--fg)"
-            strokeWidth={2}
+            strokeWidth={phone ? 3 : 2}
             strokeLinejoin="round"
             initial={{ pathLength: 0 }}
             animate={{ pathLength: inView ? 1 : 0 }}
@@ -119,10 +135,10 @@ function StepChart({ spot, bids }: { spot: Spot; bids: FeedBid[] }) {
               key={b.id}
               cx={x(times[i])}
               cy={y(b.amount)}
-              r={isTop ? 6 : 3.5}
+              r={isTop ? (phone ? 9 : 6) : phone ? 5 : 3.5}
               fill={isTop ? "var(--accent)" : "var(--surface)"}
               stroke={isTop ? "var(--surface)" : "var(--fg)"}
-              strokeWidth={isTop ? 3 : 1.5}
+              strokeWidth={isTop ? (phone ? 4 : 3) : phone ? 2 : 1.5}
               initial={{ scale: 0, opacity: 0 }}
               animate={inView ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
               transition={{ type: "spring", stiffness: 500, damping: 24, delay: (i / Math.max(bids.length - 1, 1)) * drawDuration }}
@@ -149,7 +165,12 @@ function StepChart({ spot, bids }: { spot: Spot; bids: FeedBid[] }) {
 
       {bids.length === 0 && (
         <div className="absolute inset-0 grid place-items-center">
-          <p className="rounded-full bg-surface px-3 py-1 text-sm text-muted ring-1 ring-line">No bids yet. Go first?</p>
+          <a
+            href="#spots"
+            className="rounded-full bg-surface px-4 py-2 text-sm text-muted ring-1 ring-line transition hover:text-fg hover:ring-fg"
+          >
+            No bids yet. <span className="font-semibold text-fg underline underline-offset-4">Go first?</span>
+          </a>
         </div>
       )}
     </div>
@@ -167,7 +188,7 @@ function BidList({ bids }: { bids: FeedBid[] }) {
   }
 
   return (
-    <ul className="max-h-[320px] divide-y divide-line overflow-y-auto">
+    <ul className="max-h-[360px] divide-y divide-line overflow-y-auto sm:max-h-[320px]">
       <AnimatePresence initial={false}>
         {newestFirst.map((b) => {
           const isTop = b.id === topId;
@@ -177,7 +198,7 @@ function BidList({ bids }: { bids: FeedBid[] }) {
               layout
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`relative flex items-center justify-between gap-3 px-5 py-3 ${isTop ? "bg-accent-soft/40" : ""}`}
+              className={`relative flex items-center justify-between gap-3 px-5 py-4 sm:py-3 ${isTop ? "bg-accent-soft/40" : ""}`}
             >
               {isTop && <motion.span layoutId="leader-bar" className="absolute inset-y-0 left-0 w-[3px] bg-accent" />}
               <div className="min-w-0">
@@ -281,15 +302,15 @@ export function BidBoard() {
     <div className="space-y-4">
       <div className="overflow-hidden rounded-lg border border-line bg-surface">
         {/* tabs */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
-          <div className="flex gap-1 rounded-full bg-chip p-1">
+        <div className="flex flex-col gap-2 border-b border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-5">
+          <div className="-mx-1 flex gap-1 overflow-x-auto rounded-full p-1 sm:mx-0 sm:overflow-visible sm:bg-chip">
             {SPOTS.map((s) => (
               <button
                 key={s.id}
                 type="button"
                 onClick={() => setTab(s.id)}
                 aria-pressed={tab === s.id}
-                className="relative rounded-full px-3 py-1.5 text-sm transition"
+                className="relative shrink-0 rounded-full px-3 py-2 text-sm transition"
               >
                 {tab === s.id && (
                   <motion.span layoutId="bidboard-tab" className="absolute inset-0 rounded-full bg-surface shadow-sm ring-1 ring-line" />
@@ -310,7 +331,7 @@ export function BidBoard() {
         <div className="grid lg:grid-cols-[minmax(0,1fr)_300px]">
           {/* chart */}
           <div className="border-b border-line p-4 sm:p-6 lg:border-b-0 lg:border-r">
-            <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-4">
               <div>
                 <p className="text-sm text-muted">{top ? "Top bid" : "Starts at"}</p>
                 <AnimatedUsd
@@ -323,9 +344,9 @@ export function BidBoard() {
                 type="button"
                 disabled={!open}
                 onClick={() => openBid(tab)}
-                className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white hover:bg-accent-deep transition hover:scale-[1.03] active:scale-[0.97] disabled:opacity-40"
+                className="w-full rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-deep hover:scale-[1.02] active:scale-[0.97] disabled:opacity-40 sm:w-auto sm:py-2.5"
               >
-                {open ? `Outbid for ${formatUsd(minNextBid(spot, lot))}` : "Bidding closed"}
+                {!open ? "Bidding closed" : `${top ? "Outbid for" : "Bid"} ${formatUsd(minNextBid(spot, lot))}`}
               </button>
             </div>
             {/* keyed so the draw-in replays when switching lots */}

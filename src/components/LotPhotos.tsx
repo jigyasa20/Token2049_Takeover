@@ -1,27 +1,39 @@
 "use client";
 
+import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { HERO_PHOTOS, formatUsd, isOpen, spotById, type HeroPhoto } from "@/data/spots";
 import { useBid } from "./BidProvider";
 
-// Every photo gets the same height (her height), so she's the same size in each; the
-// bag is drawn smaller inside that height via `scale`. Widths follow each photo's own
-// proportions. The height is also capped by the viewport width so all three always fit
-// in one row: 1.436 = sum of (width/height x scale) over the photos, and the px values
-// are the side gutters plus the gaps between photos.
-const HEIGHT =
-  "h-[min(64vh,560px,calc((100vw-64px)/1.436))] sm:h-[min(70vh,640px,calc((min(100vw,1024px)-144px)/1.436))]";
+// Desktop: all three side by side. Every photo gets the same height (her height), so she's
+// the same size in each; the bag is drawn smaller inside that height via `scale`. The
+// height is also capped by the viewport width so the row always fits: 1.436 = sum of
+// (width/height x scale) over the photos, px values = side gutters + gaps.
+const ROW_HEIGHT = "h-[min(70vh,640px,calc((min(100vw,1024px)-144px)/1.436))]";
+// Phone: one photo at a time, so it only has to fit the screen on its own.
+const SLIDE_H = "min(56vh, 460px)";
+const SLIDE_HEIGHT = "h-[min(56vh,460px)]";
+const ROTATE_MS = 4000;
 
-function Photo({ photo }: { photo: HeroPhoto }) {
+// `standalone` = shown on its own (the phone carousel). It's sized to fit the slide both
+// ways (never taller than the slide, never wider than the screen) instead of standing on
+// the shared baseline the desktop row uses.
+function Photo({ photo, heightClass, standalone = false }: { photo: HeroPhoto; heightClass: string; standalone?: boolean }) {
   const { board, openBid } = useBid();
   const scale = photo.scale ?? 1;
+  const ratio = photo.width / photo.height;
+
+  const outer = standalone
+    ? { className: "relative flex h-full items-center", style: { width: `min(100%, calc(${SLIDE_H} * ${ratio}))` } }
+    : { className: `relative flex items-end ${heightClass}`, style: { aspectRatio: `${photo.width * scale} / ${photo.height}` } };
 
   return (
-    // Outer box: full height, as wide as the (scaled) photo. Inner box: the photo itself,
-    // resting on the bottom edge. Spot boxes are positioned relative to the inner box.
-    <div className={`relative flex items-end ${HEIGHT}`} style={{ aspectRatio: `${photo.width * scale} / ${photo.height}` }}>
+    // Outer box sets the footprint; inner box is the photo itself, with the spot boxes
+    // positioned as percentages of it.
+    <div className={outer.className} style={outer.style}>
       <div className="relative w-full" style={{ aspectRatio: `${photo.width} / ${photo.height}` }}>
-        <Image src={photo.src} alt={photo.alt} fill priority sizes="(min-width: 640px) 33vw, 40vw" className="object-contain" />
+        <Image src={photo.src} alt={photo.alt} fill priority sizes="(min-width: 640px) 33vw, 80vw" className="object-contain" />
         {photo.boxes.map((b) => {
           const spot = spotById(b.spot)!;
           const open = isOpen(board[b.spot]);
@@ -69,15 +81,86 @@ function Caption({ photo }: { photo: HeroPhoto }) {
   );
 }
 
+// Phone carousel: rotates on its own until the first swipe or dot tap, then stays put.
+function Carousel() {
+  const [index, setIndex] = useState(0);
+  const [auto, setAuto] = useState(true);
+  const [direction, setDirection] = useState(1);
+  const photo = HERO_PHOTOS[index];
+
+  useEffect(() => {
+    if (!auto) return;
+    const id = setInterval(() => {
+      setDirection(1);
+      setIndex((i) => (i + 1) % HERO_PHOTOS.length);
+    }, ROTATE_MS);
+    return () => clearInterval(id);
+  }, [auto]);
+
+  const goTo = (next: number, dir: number) => {
+    setAuto(false); // a swipe or a dot tap takes over from here
+    setDirection(dir);
+    setIndex((next + HERO_PHOTOS.length) % HERO_PHOTOS.length);
+  };
+
+  return (
+    <div className="sm:hidden">
+      <div className={`relative ${SLIDE_HEIGHT} overflow-hidden`}>
+        <AnimatePresence initial={false} mode="popLayout">
+          <motion.div
+            key={photo.src}
+            // slides across rather than fading on top of the previous photo
+            initial={{ x: `${direction * 100}%` }}
+            animate={{ x: 0 }}
+            exit={{ x: `${direction * -100}%`, opacity: 0.4 }}
+            transition={{ duration: 0.45, ease: [0.33, 1, 0.68, 1] }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.18}
+            onDragEnd={(_, info) => {
+              if (info.offset.x < -40) goTo(index + 1, 1);
+              else if (info.offset.x > 40) goTo(index - 1, -1);
+              else setAuto(false);
+            }}
+            className="absolute inset-0 flex touch-pan-y justify-center"
+          >
+            <Photo photo={photo} heightClass={SLIDE_HEIGHT} standalone />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <Caption photo={photo} />
+
+      <div className="mt-1 flex justify-center gap-1">
+        {HERO_PHOTOS.map((p, i) => (
+          <button
+            key={p.src}
+            type="button"
+            onClick={() => goTo(i, i > index ? 1 : -1)}
+            aria-label={`Show ${p.alt}`}
+            aria-current={i === index}
+            className="p-2"
+          >
+            <span className={`block h-1.5 w-1.5 rounded-full transition ${i === index ? "bg-fg" : "bg-line"}`} />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function LotPhotos() {
   return (
-    <div className="flex items-end justify-center gap-4 sm:gap-12">
-      {HERO_PHOTOS.map((photo) => (
-        <figure key={photo.src}>
-          <Photo photo={photo} />
-          <Caption photo={photo} />
-        </figure>
-      ))}
-    </div>
+    <>
+      <Carousel />
+      <div className="hidden items-end justify-center gap-4 sm:flex sm:gap-12">
+        {HERO_PHOTOS.map((photo) => (
+          <figure key={photo.src}>
+            <Photo photo={photo} heightClass={ROW_HEIGHT} />
+            <Caption photo={photo} />
+          </figure>
+        ))}
+      </div>
+    </>
   );
 }
