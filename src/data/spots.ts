@@ -81,7 +81,7 @@ export const SPOTS: Spot[] = [
     name: "Blazer + Bag",
     kicker: "Whole outfit",
     blurb: "Blazer and bag, same brand. You'd be the only logo on me all day.",
-    startingPrice: 900,
+    startingPrice: 1000,
   },
 ];
 

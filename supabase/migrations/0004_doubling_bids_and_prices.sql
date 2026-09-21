@@ -1,5 +1,5 @@
 -- Bids now double instead of going up in fixed steps, and starting prices are lower:
--- blazer $600, bag $400, both $900. The first bid on a spot may match the starting price.
+-- blazer $600, bag $400, both $1,000. The first bid on a spot may match the starting price.
 -- Run this in projects where 0001 has already been applied.
 -- Keep in sync with src/data/spots.ts (startingPrice, BID_MULTIPLIER).
 
@@ -10,7 +10,7 @@ alter table public.spots add constraint spots_bid_multiplier_check check (bid_mu
 update public.spots set bid_multiplier = 2, updated_at = now();
 update public.spots set starting_price = 600, updated_at = now() where id = 'blazer';
 update public.spots set starting_price = 400, updated_at = now() where id = 'bag';
-update public.spots set starting_price = 900, updated_at = now() where id = 'both';
+update public.spots set starting_price = 1000, updated_at = now() where id = 'both';
 
 -- min_increment is no longer used by place_bid(); kept so older rows/queries don't break.
 

@@ -122,5 +122,5 @@ revoke all on function public.place_bid(text, integer, text, text, text, text, t
 insert into public.spots (id, name, starting_price, bid_multiplier, ends_at) values
   ('blazer', 'The Blazer',     600, 2, '2026-09-25 23:59:59+08'),
   ('bag',    'The Bag',        400, 2, '2026-09-25 23:59:59+08'),
-  ('both',   'Blazer + Bag',   900, 2, '2026-09-25 23:59:59+08')
+  ('both',   'Blazer + Bag',  1000, 2, '2026-09-25 23:59:59+08')
 on conflict (id) do nothing;
